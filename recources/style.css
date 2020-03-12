@@ -6,6 +6,9 @@ body{
     width: 100%;
     height: 100vh;    
 }
+table{
+    margin-top: 200px;
+}
 tr{ margin: 0; padding: 0;}
 td {
     content: " ";
@@ -19,4 +22,6 @@ td {
     border: 1px solid black;
     margin: 0;
     padding: 0;
+    background-image: url(img/unnamed.jpg);
+    background-size: cover;
 }

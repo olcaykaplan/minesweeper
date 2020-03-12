@@ -32,18 +32,18 @@ setup = (difficulty) => {
             bombCell.push(random);}
     }
         console.log(bombCell);
-    for(let i = 0; i < row; i++)
+    for(let r = 1; r <= row; r++)
     {   // create row
-        let write = `<tr class= '${i}'>`;
+        let write = `<tr class= '${r}'>`;
           
-            for( let i2 = 1; i2 <= column; i2++ )
+            for( let c = 1; c <= column; c++ )
             {   // create cells 
-                number = (i*column)+i2;
+                number =  r > 1 ? ((r-1)*column)+c : c ;
                
                 if(bombCell.includes(number)){ // if the number of cell has in the bombCell array make data-bomb 'true'
-                    write+= `<td class='cell bombs' data-bomb='true' data-value='${number}' id='${number}'> </td> `;}
+                    write+= `<td class='cell bombs' data-bomb='true' data-value='${number}' data-column='${c}' data-row='${r}'  id='${c}/${r}'> </td> `;}
                 else { // if number is not found in the array, make data-bomb 'false'
-                    write+= `<td class='cell' data-bomb='false' data-value='${number}' id='${number}' > </td> `;}            
+                    write+= `<td class='cell' data-bomb='false' data-value='${number}' data-column='${c}' data-row='${r}' id='${c}/${r}' > </td> `;}            
             }
          write += "</tr>";
         writeTable += write;
@@ -57,23 +57,80 @@ setup = (difficulty) => {
 mines.addEventListener('click', e=>{
     
     if(bombed == false )
-{
+    {
     //characterView.openCharacterViewPage();
-   let checkBomb = e.target.closest('.cell').dataset.bomb;
-   let allBombCells = document.querySelectorAll('.bombs');
-    if(checkBomb == 'true'){
-        bombed=true; // after bombed this script will do nothing until game restarted
-       allBombCells.forEach(e => {
-           const icon = document.createElement('i');
-        icon.className="fas fa-bomb";
-          console.log(e.id);
-           document.getElementById(`${e.id}`).appendChild(icon);
-       })   
+       let clickedCell = e.target.closest('.cell'); 
+       let checkBomb = clickedCell.dataset.bomb;
+       let allBombCells = document.querySelectorAll('.bombs');
+  
+        if(checkBomb == 'true'){
+
+            bombed=true; // after bombed this script will do nothing until game restarted
+            allBombCells.forEach(e => {
+
+               document.getElementById(`${e.id}`).style.backgroundImage="url(' ')";
+                document.getElementById(`${e.id}`).style.background="#FA8072";
+
+               const icon = document.createElement('i');
+               icon.className="fas fa-bomb";
+               document.getElementById(`${e.id}`).appendChild(icon);
+           })   
+        }
+        else{
+
+            const cId = clickedCell.id;
+            const cIdColumn = parseInt(clickedCell.dataset.column);
+            const cIdRow = parseInt(clickedCell.dataset.row);
+            
+            document.getElementById(cId).style.background ="#9b7653";
+            // clear the cell and areas and also write the count of the bomb around of this cell
+         /*   let checkCellArray = [ 
+                `${cIdColumn}/${cIdRow-1}`, `${cIdColumn-1}/${cIdRow-1}`,`${cIdColumn+1}/${cIdRow-1}`,
+                `${cIdColumn}/${cIdRow+1}`, `${cIdColumn-1}/${cIdRow+1}`,`${cIdColumn+1}/${cIdRow+1}`,
+                `${cIdColumn+1}/${cIdRow}`, `${cIdColumn-1}/${cIdRow}`,
+                ]*/
+            
+            if(cIdRowow == 1 ) { //  if the cell is at first row we cant check previous row
+               if(cIdColumn == 1){
+                   // if the cell is also first column, we cant check previous column
+               }
+                else if (cIdColumn == difficultyTypes[difficulty].column){
+                    // if thecell is also last column, we cant check next column
+                }
+                else{
+                    // if the cell is not at first column or last we can check previous column and next
+                }
+            }
+            else if (cIdRow == difficultyTypes[difficulty].row ){ //if the cell is at last row we cant check next row
+                if(cIdColumn == 1){
+                   // if the cell is also first column, we cant check previous column
+               }
+                else if (cIdColumn == difficultyTypes[difficulty].column){
+                    // if the cell is also last column, we cant check next column
+                }
+                else{
+                    // if the cell is not at first column or last we can check previous column and next
+                }
+            }
+            else{ //if the cell is at last row we cant check next row
+                if(cIdColumn == 1){
+                   // if the cell is also first column, we cant check previous column
+               }
+                else if (cIdColumn == difficultyTypes[difficulty].column){
+                    // if the cell is also last column, we cant check next column
+                }
+                else{
+                    // if the cell is not at first column or last we can check previous column and next
+                }
+            }
+            
+            
+            let clearCells= [], bombCells = [];
+            checkCellArray.forEach(e=>{
+              let eColumn
+            })
+            console.log(checkCellArray);
+        }
     }
-    else{
-        alert("You likey bitch!")
-        // clear the cell and areas and also write the count of the bomb around of this cell
-    }
-}
    
 });
