@@ -25,6 +25,7 @@ const difficultyTypes = {
 }
 let clearCells = [];
 let bombCells = [];
+let checkCellArray = [];
 let bombCount = '';
 window.onload = () => {
 	setup( difficulty );
@@ -50,9 +51,9 @@ setup = ( difficulty ) => {
 		for ( let c = 1; c <= column; c++ ) { // create cells 
 			number = r > 1 ? ( ( r - 1 ) * column ) + c : c;
 			if ( createdBombs.includes( number ) ) { // if the number of cell has in the bombCell array make data-bomb 'true'
-				write += `<td class='cell bombs' data-bomb='true' data-value='${number}' data-column='${c}' data-row='${r}'  id='${c}/${r}'> </td> `;
+				write += `<td class='cell bombs' data-bomb='true' data-value='${number}' data-column='${c}' data-row='${r}' data-status ='close' id='${c}/${r}'>${c}/${r}</td> `;
 			} else { // if number is not found in the array, make data-bomb 'false'
-				write += `<td class='cell' data-bomb='false' data-value='${number}' data-column='${c}' data-row='${r}' id='${c}/${r}' > </td> `;
+				write += `<td class='cell' data-bomb='false' data-value='${number}' data-column='${c}' data-row='${r}' data-status ='close' id='${c}/${r}' > ${c}/${r}</td> `;
 			}
 		}
 		write += "</tr>";
@@ -61,9 +62,11 @@ setup = ( difficulty ) => {
 	mines.insertAdjacentHTML( "afterbegin", writeTable );
 }
 mines.addEventListener( 'click', e => {
-	if ( bombed == false ) {
+	if ( bombed == false) {
 		//characterView.openCharacterViewPage();
 		let clickedCell = e.target.closest( '.cell' );
+        debugger;
+        if(document.getElementById(clickedCell.id).dataset.status == 'close'){
 		let checkBomb = clickedCell.dataset.bomb;
 		let allBombCells = document.querySelectorAll( '.bombs' );
 		if ( checkBomb == 'true' ) {
@@ -82,18 +85,19 @@ mines.addEventListener( 'click', e => {
               const cIdRow = parseInt(clickedCell.dataset.row);*/
             
 			document.getElementById( cId ).style.background = "#9b7653";
-			let checkCellArray = findCheckCellArray( row, column );
+			let childCheckCellArray = findCheckCellArray( row, column );
 			// clear the cell and areas and also write the count of the bomb around of this cell
-			controlledCells( cId, checkCellArray, true );
+			controlledCells( cId, childCheckCellArray, true );
 			
-		}
-	}
+             }
+        }
+    }
 } );
 
 //
 getValues = (id) =>{
     const el = document.getElementById(id);  
-    debugger;
+  
     return {
         column : parseInt(el.dataset.column),
         row : parseInt(el.dataset.row)
@@ -102,70 +106,174 @@ getValues = (id) =>{
 
 // which cells will be controlled
 findCheckCellArray = ( row, column ) => {
-	let checkCellArray = [];
+	let childCheckCellArray = [];
+   /* es git:(master) ✗ node app
+[ { name: 'Krunal', age: 26 },
+  { name: 'Ankit', age: 24 },
+  { name: 'Rushabh', age: 27 } ]*/
 	if ( row == 1 ) { //  if the cell is at first row we cant check previous row
 		if ( column == 1 ) {
 			// if the cell is also first column, we cant check previous column   
-			checkCellArray = [ `${column}/${row+1}`, `${column+1}/${row+1}`, `${column+1}/${row}`, ];
-		} else if ( cIdColumn == difficultyTypes[ difficulty ].column ) {
+        // {name : `${column}/${row}`, value: false }
+			childCheckCellArray = [ {name : `${column}/${row+1}`, value: false }, {name : `${column+1}/${row+1}`, value: false }, 
+                                   {name : `${column+1}/${row}`, value: false } ];
+		} else if ( column == difficultyTypes[ difficulty ].column ) {
 			// if thecell is also last column, we cant check next column,
-			checkCellArray = [ `${column}/${row+1}`, `${column-1}/${row+1}`, `${column-1}/${row}`, ];
+           
+			childCheckCellArray = [ {name : `${column}/${row+1}`, value: false }, {name : `${column-1}/${row+1}`, value: false }, 
+                                    {name : `${column}/${row}`, value: false } ];
 		} else {
+         
 			// if the cell is not at first column or last we can check previous column and the next
-			checkCellArray = [ `${column}/${row+1}`, `${column-1}/${row+1}`, `${column-1}/${row}`, `${column+1}/${row+1}`, `${column+1}/${row}` ];
+            childCheckCellArray = [ {name : `${column}/${row+1}`, value: false },  {name : `${column-1}/${row}`, value: false }, 
+                                    {name : `${column-1}/${row+1}`, value: false }, {name : `${column+1}/${row+1}`, value: false },
+                                    {name : `${column+1}/${row}`, value: false }];
 		}
 	} else if ( row == difficultyTypes[ difficulty ].row ) { //if the cell is at last row we cant check next row
-		if ( column == 1 ) {
+		if ( column == 1 ) {   
 			// if the cell is also first column, we cant check previous column
-			checkCellArray = [ `${column}/${row-1}`, `${column+1}/${row-1}`, `${column+1}/${row}`, ];
-		} else if ( column == difficultyTypes[ difficulty ].column ) {
+            childCheckCellArray = [{name : `${column}/${row-1}`, value: false }, {name : `${column+1}/${row-1}`, value: false },
+                                   {name : `${column+1}/${row}`, value: false }];
+		} else if ( column == difficultyTypes[ difficulty ].column ) {  
 			// if the cell is also last column, we cant check next column
-			checkCellArray = [ `${column}/${row-1}`, `${column-1}/${row-1}`, `${column-1}/${row}`, ];
-		} else {
+            
+            childCheckCellArray = [{name : `${column}/${row-1}`, value: false }, {name : `${column-1}/${row-1}`, value: false }, 
+                                   {name : `${column-1}/${row}`, value: false }];
+			
+		} else {    
 			// if the cell is not at first column or last we can check previous column and next
-			checkCellArray = [ `${column}/${row-1}`, `${column-1}/${row-1}`, `${column-1}/${row}`, `${column+1}/${row-1}`, `${column+1}/${row}` ];
+			childCheckCellArray = [{name : `${column}/${row-1}`, value: false}, {name : `${column-1}/${row-1}`, value: false}, 
+                                   {name : `${column-1}/${row}`, value: false}, {name : `${column+1}/${row-1}`, value: false}, 
+                                   {name : `${column+1}/${row}`, value: false}];
+            //childCheckCellArray = [ `${column}/${row-1}`, `${column-1}/${row-1}`, `${column-1}/${row}`, `${column+1}/${row-1}`, `${column+1}/${row}` ];
 		}
-	} else { //if the cell is nıot at the first row or last row we cant check next row
-		if ( row == 1 ) {
+	} else { //if the cell is not at the first row or last row we cant check next row
+		if ( column == 1 ) { 
 			// if the cell is also first column, we cant check previous column
-			checkCellArray = [ `${column}/${row-1}`, `${column+1}/${row-1}`, `${column}/${row+1}`, `${column+1}/${row+1}`, `${column+1}/${row}`, ];
-		} else if ( column == difficultyTypes[ difficulty ].column ) {
+            childCheckCellArray = [{name : `${column}/${row-1}`, value: false}, {name : `${column+1}/${row-1}`, value: false}, 
+                                   {name : `${column}/${row+1}`, value: false}, {name : `${column}/${row+1}`, value: false}, 
+                                   {name : `${column+1}/${row+1}`, value: false}, {name : `${column+1}/${row}`, value: false}];
+			//childCheckCellArray = [ `${column}/${row-1}`, `${column+1}/${row-1}`, `${column}/${row+1}`, `${column+1}/${row+1}`, `${column+1}/${row}`, ];
+		} else if ( column == difficultyTypes[ difficulty ].column ) { 
 			// if the cell is also last column, we cant check next column
-			checkCellArray = [ `${column}/${row-1}`, `${column-1}/${row-1}`, `${column}/${row+1}`, `${column-1}/${row+1}`, `${column-1}/${row}`, ];
-		} else {
+	       childCheckCellArray = [{name : `${column}/${row-1}`, value: false}, {name : `${column-1}/${row-1}`, value: false},
+                                  {name : `${column-1}/${row+1}`, value: false}, {name : `${column-1}/${row}`, value: false}]
+            //childCheckCellArray = [ `${column}/${row-1}`, `${column-1}/${row-1}`, `${column}/${row+1}`, `${column-1}/${row+1}`, `${column-1}/${row}`, ];
+		} else { 
 			// if the cell is not at first column or last we can check previous column and next
-			checkCellArray = [ `${column}/${row-1}`, `${column-1}/${row-1}`, `${column+1}/${row-1}`, `${column}/${row+1}`, `${column-1}/${row+1}`, `${column+1}/${row+1}`, `${column+1}/${row}`, `${column-1}/${row}` ];
+			childCheckCellArray = [{name : `${column}/${row-1}`, value: false}, {name : `${column-1}/${row-1}`, value: false},
+                                   {name : `${column+1}/${row-1}`, value: false}, {name : `${column}/${row+1}`, value: false},
+                                   {name : `${column-1}/${row+1}`, value: false}, {name : `${column+1}/${row+1}`, value: false},
+                                   {name : `${column+1}/${row}`, value: false}, {name : `${column-1}/${row}`, value: false}];
+            /*childCheckCellArray = [ `${column}/${row-1}`, `${column-1}/${row-1}`, `${column+1}/${row-1}`, `${column}/${row+1}`, `${column-1}/${row+1}`, `${column+1}/${row+1}`, `${column+1}/${row}`, `${column-1}/${row}` ];*/
 		}
 	}
-	return checkCellArray;
-}
-//take the cells in array which are clear and bomb and count bomb around given cell
-controlledCells = ( pointedCell, checkCellArray, cliked) => {
-   // if(cliked){
-        checkCellArray.forEach( e => {
-            // debugger;
-            let eCell = document.getElementById( e );
-            if ( eCell.dataset.bomb == 'true' ) {
-                bombCells.push(e);
-                bombCount++;
-            } else {
-                clearCells.push(e);
-            }
-        } );
-        document.getElementById( pointedCell ).innerHTML = `${bombCount}`;
-        bombCount = '';
-        makeClearCellsActive( clearCells );
-  //  }
+    if(checkCellArray.length == 0){
+       
+        checkCellArray = checkCellArray.concat(childCheckCellArray);
+        checkCellArray.push({name:`${column}/${row}`, value :false} );
+        return childCheckCellArray;
+    }
+    else{
+        
+         /* console.log("mother array:"+checkCellArray);
+        console.log(childCheckCellArray);*/
+        let childArrayForEach = [];
+        childArrayForEach = childArrayForEach.concat(childCheckCellArray);
+   
+        childArrayForEach.forEach(e => {
+            if (checkCellArray.find(x => x.name === e.name))
+                {  debugger;
+                    if(checkCellArray[checkCellArray.findIndex(x => x.name === e.name)].value === false)
+                    {
+                        childCheckCellArray.splice(childCheckCellArray.findIndex(x => x.name === e.name),1);
+                    }
+                    else{
+                        childCheckCellArray[childCheckCellArray.findIndex(x => x.name == e.name)].value=true;
+                    }
+                }
+        });
+        //bombayı splice etmiyorsun ama arraya tekrar iteliyorsun
+        checkCellArray = checkCellArray.concat(childCheckCellArray.filter(x=> x.value == false));
+        console.log("mother array:"+checkCellArray);
+        console.log(childCheckCellArray);
+        return childCheckCellArray;
+    }
+	
     
 }
-
-makeClearCellsActive = ( clearCells ) => {
-	//debugger;
-	clearCells.forEach( e => {
-		document.getElementById( e ).style.background = "#9b7653";
-        const {column, row} = getValues(e);
-        let checkArray = findCheckCellArray(column, row);
-       // controlledCells (e, checkArray, false);
-	});
+//take the cells in array which are clear and bomb and count bomb around given cell
+controlledCells = ( pointedCell, childCheckCellArray, cliked) => {
+   
+  bombCount ='';
+    bombCells=[];
+    if (!Array.isArray(childCheckCellArray))
+      { alert("test");
+          console.log(childCheckCellArray);}
+ 
+        childCheckCellArray.forEach( e => {
+          
+            let eCell = document.getElementById( e.name );                      
+            if ( eCell.dataset.bomb == 'true' ) {
+                bombCells.push(e.name);
+                const findIndex = checkCellArray.findIndex( x => x.name == e.name);
+                debugger;
+                checkCellArray[findIndex].value = true;
+                bombCount++;
+            } else{
+                clearCells.push(e.name);
+            } 
+        });
+        document.getElementById( pointedCell ).innerHTML = `${bombCount}`;
+        document.getElementById( pointedCell ).dataset.status ='opened';
+        // eğer  hücrenin etrafında bomba yoksa etrafı da incelenmeli !
   
+    if(cliked)
+    {   
+            clearCells.forEach( e => {
+                 document.getElementById( e ).style.background = "#9b7653";
+                 document.getElementById( e ).dataset.status = 'opened';
+           });
+            clearCells.forEach(e => {
+                    const {column, row} = getValues(e);
+                    let checkArray = findCheckCellArray(row, column);
+                    controlledCells(e, checkArray, false);
+                })
+           
+    }
+    
+    else 
+        {
+            if(bombCells.length > 0){
+                 document.getElementById( pointedCell ).style.background = "#9b7653";
+                 document.getElementById( pointedCell ).dataset.status = 'opened';
+                 document.getElementById( pointedCell ).innerHTML = `${bombCount}`;
+            }
+            else{
+             
+                clearCells.forEach(e => {
+                     document.getElementById( e ).style.background = "#9b7653";
+                     document.getElementById( e ).dataset.status = 'opened';
+                })
+            }
+            
+        }
+}
+
+
+
+makeClearCellsActive = ( clearCells, cliked =false ) => {
+ 
+         if(typeof clearCells == 'number'){
+             document.getElementById( e ).style.background = "#9b7653";
+             document.getElementById( e ).dataset.status = 'opened';
+         }
+        else{
+            clearCells.forEach( e => {
+                document.getElementById( e ).style.background = "#9b7653";
+                 document.getElementById( e ).dataset.status = 'opened';
+
+           });
+        }
+        
 }
