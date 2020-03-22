@@ -5,7 +5,7 @@ body {}
 	height: 100vh;
 }
 table {
-	margin-top: 200px;
+	//margin-top: 200px;
 }
 tr {
 	margin: 0;
@@ -23,6 +23,14 @@ td {
 	border: 1px solid black;
 	margin: 0;
 	padding: 0;
-	//background-image: url(img/unnamed.jpg);
 	background-size: cover;
+     transition:    background-color 0.5s;
 }
+.passive:hover{
+    background-color:lightgreen;
+    transition: 1c
+}
+.active{
+    background-color: green;
+}
+
