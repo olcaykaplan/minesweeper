@@ -1,4 +1,4 @@
-body {}
+body {background-color: #37474F}
 .minesweeper {
 	text-align: center;
 	width: 100%;
@@ -11,26 +11,64 @@ tr {
 	margin: 0;
 	padding: 0;
 }
+
 td {
 	content: " ";
 	float: left;
 	text-decoration: none;
 	list-style: none;
-	width: 50px;
-	height: 58px;
-	background-color: lightgray;
 	text-align: center;
-	border: 1px solid black;
+	vertical-align: middle;
+    border: 1px solid black;
 	margin: 0;
 	padding: 0;
 	background-size: cover;
-     transition:    background-color 0.5s;
-}
-.passive:hover{
-    background-color:lightgreen;
-    transition: 1c
-}
-.active{
-    background-color: green;
+    background-color: white;
+    transition:    background-color 0.5s;
+    font-family: "Times New Roman", Times, serif;;
+   
 }
 
+.passive:hover{
+    background-color:#CFD8DC;
+}
+.active{
+    background-color: #607D8B;
+}
+.cell.easy{
+	width: 50px;
+	height: 58px;
+    line-height: 50px;;
+}
+.cell.medium{
+    width: 40px;
+    height: 40px;
+    line-height: 40px;;
+}
+.cell.hard{
+    width: 30px;
+    height: 30px;
+    line-height: 30px;;
+}
+.difficulty{
+    color: white;
+    border: 2px solid white;
+    border-radius: 5px;
+    width: 250px;
+    text-align: center;
+    padding: 5px;
+    margin: 5px;
+}
+#selectedDifficulty{
+    height: 30px;
+    width: 120px;
+    border: none;
+    border-bottom: 2px solid white;;
+    background-color: #37474F;
+    color: white;
+    margin: 
+}
+.score{
+    float: left;
+    color: white;
+}

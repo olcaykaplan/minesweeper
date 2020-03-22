@@ -1,5 +1,5 @@
-let difficulty = "easy";
-let writeTable = ""
+//let difficulty = "easy";
+
 let createdBombs = [];
 let bombed = false;
 const mines = document.querySelector('#mines');
@@ -29,15 +29,33 @@ let clearCells = [];
 let bombCells = [];
 let checkCellArray = [];
 let bombCount = '';
+let message ='';
 window.onload = () => {
-	setup( difficulty );
+	getDifficultyType()
+    
+  
+  
 };
 /* ---- SETUP ----*/
+getDifficultyType = () => {
+//mines.innerHTML ="";
+    bombed= false;
+    setup(document.getElementById("selectedDifficulty").value);
+}
+
 setup = ( difficulty ) => {
+   // debugger;
+ 
+   mines.innerHTML ="";
+    createdBombs = [];
+    let writeTable = ""
 	let number = 0;
+    
 	 dColumn = difficultyTypes[ difficulty ].column;
 	 dRow = difficultyTypes[ difficulty ].row;
+    bombCount = difficultyTypes[ difficulty ].bomb;
 	let bomb = difficultyTypes[ difficulty ].bomb;
+    document.getElementById("bombCount").innerHTML=bomb;
 	for ( let i = 1; i <= bomb; i++ ) {
 		//create random numbers between 1 to max-cell number of difficulty
 		let random = Math.floor( Math.random( 0, 1 ) * ( dRow * dColumn ) ) + 1;
@@ -47,15 +65,18 @@ setup = ( difficulty ) => {
 			createdBombs.push( random );
 		}
 	}
+    console.log(dColumn);
+    console.log(dRow);
 	console.log( createdBombs );
+    debugger;
 	for ( let r = 1; r <= dRow; r++ ) { // create row
 		let write = `<tr class= '${r}'>`;
 		for ( let c = 1; c <= dColumn; c++ ) { // create cells 
 			number = r > 1 ? ( ( r - 1 ) * dColumn ) + c : c;
 			if ( createdBombs.includes( number ) ) { // if the number of cell has in the bombCell array make data-bomb 'true'
-				write += `<td class='cell bombs passive' data-bomb='true' data-value='${number}' data-column='${c}' data-row='${r}' data-hidden = 'true' id='${c}/${r}'></td> `;
+				write += `<td class='cell ${difficulty} bombs passive ' data-bomb='true' data-value='${number}' data-column='${c}' data-row='${r}' data-hidden = 'true' id='${c}/${r}'></td> `;
 			} else { // if number is not found in the array, make data-bomb 'false'
-				write += `<td class='cell passive' data-bomb='false' data-value='${number}' data-column='${c}' data-row='${r}' data-hidden ='true' id='${c}/${r}' > </td> `;
+				write += `<td class='cell ${difficulty} passive ' data-bomb='false' data-value='${number}' data-column='${c}' data-row='${r}' data-hidden ='true' id='${c}/${r}' > </td> `;
 			}
 		}
 		write += "</tr>";
@@ -66,10 +87,9 @@ setup = ( difficulty ) => {
 
 
 mines.addEventListener( 'click', e => {
-  
-   
+ 
+   debugger;
 	if ( bombed == false) {
-		//characterView.openCharacterViewPage();
 		let clickedCell = e.target.closest( '.cell' );
       
         if(document.getElementById(clickedCell.id).dataset.hidden == 'true'){
@@ -79,29 +99,34 @@ mines.addEventListener( 'click', e => {
 			bombed = true; // after bombed this script will do nothing until game restarted
 			allBombCells.forEach( e => {
 				document.getElementById( `${e.id}` ).style.backgroundImage = "url(' ')";
-				document.getElementById( `${e.id}` ).style.background = "#FA8072";
+				document.getElementById( `${e.id}` ).style.background = "#d72323";
 				const icon = document.createElement( 'i' );
 				icon.className = "fas fa-bomb";
 				document.getElementById( `${e.id}` ).appendChild( icon );
+                message = 'GAME OVER!';
+                $('#message').text(message);
+                 $("#myModal").modal('show');
 			} )
 		} else {
 			const cId = clickedCell.id;
-			//const {column, row} = getValues(cId);
-              /*const cIdColumn = parseInt(clickedCell.dataset.column);
-              const cIdRow = parseInt(clickedCell.dataset.row);*/
-            
-			//document.getElementById( cId ).style.background = "#9b7653";
-			//let childCheckCellArray = findCheckCellArray( row, column );
-			// clear the cell and areas and also write the count of the bomb around of this cell
 			controlledCells(cId);
-			
-             }
+            let vb = document.querySelectorAll('.passive').length;
+                
+            debugger;
+            if(vb == bombCount)
+                {
+                    message = 'YOU WIN!!';
+                $('#message').text(message);
+                 $("#myModal").modal('show');
+                }
+        }
         }
     }
 } );
 
 //
 getValues = (id) =>{
+
     const el = document.getElementById(id);  
   
     return {
@@ -139,8 +164,6 @@ controlledCells = ( pointedCell) => {
       }
       
     checkTheBomb(row, column);
-      
-       
 }
 
 getMineCount = (c, r) => {
@@ -156,5 +179,4 @@ getMineCount = (c, r) => {
         }
     return count;
 }
-
 
