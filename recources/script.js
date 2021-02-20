@@ -15,6 +15,7 @@ const difficultyTypes = {
 		column: 10,
 		row: 20,
 		bomb: 35
+        countBomb: 35
 	},
 	hard: {
 		name: 'hard',
@@ -30,6 +31,8 @@ let bombCells = [];
 let checkCellArray = [];
 let bombCount = '';
 let message ='';
+let flagCount = ''
+
 window.onload = () => {
 	getDifficultyType()
     
@@ -51,8 +54,8 @@ setup = ( difficulty ) => {
     let writeTable = ""
 	let number = 0;
     
-	 dColumn = difficultyTypes[ difficulty ].column;
-	 dRow = difficultyTypes[ difficulty ].row;
+	dColumn = difficultyTypes[ difficulty ].column;
+	dRow = difficultyTypes[ difficulty ].row;
     bombCount = difficultyTypes[ difficulty ].bomb;
 	let bomb = difficultyTypes[ difficulty ].bomb;
     document.getElementById("bombCount").innerHTML=bomb;
@@ -68,7 +71,7 @@ setup = ( difficulty ) => {
     console.log(dColumn);
     console.log(dRow);
 	console.log( createdBombs );
-    debugger;
+   
 	for ( let r = 1; r <= dRow; r++ ) { // create row
 		let write = `<tr class= '${r}'>`;
 		for ( let c = 1; c <= dColumn; c++ ) { // create cells 
@@ -84,44 +87,71 @@ setup = ( difficulty ) => {
 	}
 	mines.insertAdjacentHTML( "afterbegin", writeTable );
 }
+//added more than one time flag and  td is not disabled when flas is available
+//also it should remove when flagged td is clickt again
+mines.addEventListener("contextmenu", function(e) {
+  e.preventDefault();
+  let clickedCell = e.target.closest( '.cell' );
+  let Isflagged = document.getElementById(clickedCell.id).childNodes
 
+  if(document.getElementById( clickedCell.id ).lastElementChild){
+    console.log("before remove Isflagged ", Isflagged)
+    document.getElementById( clickedCell.id ).lastElementChild.remove();
+     Isflagged = document.getElementById(clickedCell.id).childNodes
+     console.log("after change Isflagged",Isflagged)
+ }
+else{
+    const svg = document.createElement( 'svg' );
+    svg.className = "fab fa-font-awesome-flag";
+    document.getElementById( clickedCell.id ).appendChild( svg );
+}
+    
+});
 
 mines.addEventListener( 'click', e => {
- 
-   debugger;
 	if ( bombed == false) {
 		let clickedCell = e.target.closest( '.cell' );
-      
-        if(document.getElementById(clickedCell.id).dataset.hidden == 'true'){
-		let checkBomb = clickedCell.dataset.bomb;
-		let allBombCells = document.querySelectorAll( '.bombs' );
-		if ( checkBomb == 'true' ) {
-			bombed = true; // after bombed this script will do nothing until game restarted
-			allBombCells.forEach( e => {
-				document.getElementById( `${e.id}` ).style.backgroundImage = "url(' ')";
-				document.getElementById( `${e.id}` ).style.background = "#d72323";
-				const icon = document.createElement( 'i' );
-				icon.className = "fas fa-bomb";
-				document.getElementById( `${e.id}` ).appendChild( icon );
-                message = 'GAME OVER!';
-                $('#message').text(message);
-                 $("#myModal").modal('show');
-			} )
-		} else {
-			const cId = clickedCell.id;
-			controlledCells(cId);
-            let vb = document.querySelectorAll('.passive').length;
-                
-            debugger;
-            if(vb == bombCount)
-                {
+        let Isflagged = document.getElementById(clickedCell.id).childNodes
+       console.log("Isflagged", Isflagged )
+     
+         if( Isflagged[0]?.classList || (Isflagged[1] && Isflagged[1].classList[1] == "fa-font-awesome-flag") )
+            {console.log("is flagged")
+                flagCount++;
+            }
+        else 
+        {console.log("else flag")
+            if(document.getElementById(clickedCell.id).dataset.hidden == 'true'){
+            let checkBomb = clickedCell.dataset.bomb;
+            let allBombCells = document.querySelectorAll( '.bombs' );
+            if ( checkBomb == 'true' ) {
+                bombed = true; // after bombed this script will do nothing until game restarted
+                allBombCells.forEach( e => {
+                    document.getElementById( `${e.id}` ).style.backgroundImage = "url(' ')";
+                    document.getElementById( `${e.id}` ).style.background = "#d72323";
+                    const svg = document.createElement( 'svg' );
+                    svg.className = "fas fa-bomb";
+                    document.getElementById( `${e.id}` ).appendChild( svg );
+                    message = 'GAME OVER!';
+                    $('#message').text(message);
+                    $("#myModal").modal('show');
+                } )
+            } else {
+                const cId = clickedCell.id;
+                controlledCells(cId);
+                let vb = document.querySelectorAll('.passive').length;
+                    
+            
+                if(vb == bombCount)
+                    {
                     message = 'YOU WIN!!';
-                $('#message').text(message);
-                 $("#myModal").modal('show');
-                }
-        }
-        }
-    }
+                    $('#message').text(message);
+                    $("#myModal").modal('show');
+                    }
+            }
+            }
+          }
+          console.log("buraya düştü")
+     }
 } );
 
 //
@@ -143,7 +173,7 @@ controlledCells = ( pointedCell) => {
     const {column, row} = getValues(pointedCell);
     
       checkTheBomb = (r,c) => {
-          debugger;
+         
             if( c < 1 || r < 1 || r > dRow || c > dColumn ) return;
             const cell = document.getElementById(`${c}/${r}`) ;
             if(cell.dataset.bomb == 'true' || cell.dataset.hidden == 'false') return;
