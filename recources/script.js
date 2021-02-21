@@ -9,13 +9,13 @@ const difficultyTypes = {
 		column: 6,
 		row: 12,
 		bomb: 10
+      
 	},
 	medium: {
 		name: 'medium',
 		column: 10,
 		row: 20,
 		bomb: 35
-        countBomb: 35
 	},
 	hard: {
 		name: 'hard',
@@ -31,14 +31,9 @@ let bombCells = [];
 let checkCellArray = [];
 let bombCount = '';
 let message ='';
-let flagCount = ''
+let flagCount = 0;
 
-window.onload = () => {
-	getDifficultyType()
-    
-  
-  
-};
+window.onload = () => {	getDifficultyType() };
 /* ---- SETUP ----*/
 getDifficultyType = () => {
 //mines.innerHTML ="";
@@ -57,6 +52,7 @@ setup = ( difficulty ) => {
 	dColumn = difficultyTypes[ difficulty ].column;
 	dRow = difficultyTypes[ difficulty ].row;
     bombCount = difficultyTypes[ difficulty ].bomb;
+    setFlagCountHTML();
 	let bomb = difficultyTypes[ difficulty ].bomb;
     document.getElementById("bombCount").innerHTML=bomb;
 	for ( let i = 1; i <= bomb; i++ ) {
@@ -87,6 +83,12 @@ setup = ( difficulty ) => {
 	}
 	mines.insertAdjacentHTML( "afterbegin", writeTable );
 }
+
+
+const setFlagCountHTML = () => {
+    document.getElementById("flagCount").innerHTML=flagCount;
+}
+
 //added more than one time flag and  td is not disabled when flas is available
 //also it should remove when flagged td is clickt again
 mines.addEventListener("contextmenu", function(e) {
@@ -99,11 +101,15 @@ mines.addEventListener("contextmenu", function(e) {
     document.getElementById( clickedCell.id ).lastElementChild.remove();
      Isflagged = document.getElementById(clickedCell.id).childNodes
      console.log("after change Isflagged",Isflagged)
+     flagCount--;
+     setFlagCountHTML();
  }
 else{
     const svg = document.createElement( 'svg' );
     svg.className = "fab fa-font-awesome-flag";
     document.getElementById( clickedCell.id ).appendChild( svg );
+    flagCount++;
+    setFlagCountHTML();
 }
     
 });
@@ -112,14 +118,10 @@ mines.addEventListener( 'click', e => {
 	if ( bombed == false) {
 		let clickedCell = e.target.closest( '.cell' );
         let Isflagged = document.getElementById(clickedCell.id).childNodes
-       console.log("Isflagged", Isflagged )
-     
          if( Isflagged[0]?.classList || (Isflagged[1] && Isflagged[1].classList[1] == "fa-font-awesome-flag") )
-            {console.log("is flagged")
-                flagCount++;
-            }
+            {flagCount++;}
         else 
-        {console.log("else flag")
+        {
             if(document.getElementById(clickedCell.id).dataset.hidden == 'true'){
             let checkBomb = clickedCell.dataset.bomb;
             let allBombCells = document.querySelectorAll( '.bombs' );
